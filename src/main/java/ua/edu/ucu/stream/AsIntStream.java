@@ -2,69 +2,137 @@ package ua.edu.ucu.stream;
 
 import ua.edu.ucu.function.*;
 
-public class AsIntStream implements IntStream {
+import java.util.ArrayList;
 
-    private AsIntStream() {
-        // To Do
+public class AsIntStream implements IntStream {
+    private final ArrayList<Integer> stream;
+
+    public AsIntStream(ArrayList<Integer> array) {
+        this.stream = array;
     }
 
     public static IntStream of(int... values) {
-        return null;
+        ArrayList<Integer> integerArray = new ArrayList<>();
+        for (int integer : values) {
+            integerArray.add(integer);
+        }
+        return new AsIntStream(integerArray);
     }
 
     @Override
     public Double average() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (this.stream.size() == 0) {
+            throw new IllegalArgumentException();
+        }
+        return ((double) sum() / this.stream.size());
     }
 
     @Override
     public Integer max() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (this.stream.size() == 0) {
+            throw new IllegalArgumentException();
+        }
+        int max = this.stream.get(0);
+        for (int i = 1; i < this.stream.size(); i++) {
+            if (max < this.stream.get(i)) {
+                max = this.stream.get(i);
+            }
+        }
+        return max;
     }
 
     @Override
     public Integer min() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (this.stream.size() == 0) {
+            throw new IllegalArgumentException();
+        }
+        int min = this.stream.get(0);
+        for (int i = 1; i < this.stream.size(); i++) {
+            if (min > this.stream.get(i)) {
+                min = this.stream.get(i);
+            }
+        }
+        return min;
     }
 
     @Override
     public long count() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        int counter = 0;
+        for (int i = 0; i < this.stream.size(); i++) {
+            counter += 1;
+        }
+        return counter;
     }
 
     @Override
     public Integer sum() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (this.stream.size() == 0) {
+            throw new IllegalArgumentException();
+        }
+        int sum = 0;
+        for (int integer : this.stream) {
+            sum += integer;
+        }
+        return sum;
     }
 
     @Override
     public IntStream filter(IntPredicate predicate) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ArrayList<Integer> checkedArray = new ArrayList<>();
+        for (int integer : this.stream) {
+            if (predicate.test(integer)) {
+                checkedArray.add(integer);
+            }
+        }
+        return new AsIntStream(checkedArray);
     }
 
     @Override
     public void forEach(IntConsumer action) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        for (int integer : this.stream) {
+            action.accept(integer);
+        }
     }
 
     @Override
     public IntStream map(IntUnaryOperator mapper) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ArrayList<Integer> mappedArray = new ArrayList<>();
+        for (int integer : this.stream) {
+            int mappedInteger = mapper.apply(integer);
+            mappedArray.add(mappedInteger);
+        }
+        return new AsIntStream(mappedArray);
     }
 
     @Override
     public IntStream flatMap(IntToIntStreamFunction func) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ArrayList<IntStream> flatmappedArray = new ArrayList<>();
+        for (int integer : this.stream) {
+            IntStream mappedStream = func.applyAsIntStream(integer);
+            flatmappedArray.add((AsIntStream) mappedStream);
+        }
+        ArrayList<Integer> dismappedArray = new ArrayList<>();
+        for (IntStream mapped : flatmappedArray) {
+            dismappedArray.addAll(((AsIntStream) mapped).stream);
+        }
+        return new AsIntStream(dismappedArray);
     }
 
     @Override
     public int reduce(int identity, IntBinaryOperator op) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        int reduced = identity;
+        for (int integer : this.stream) {
+            reduced = op.apply(reduced, integer);
+        }
+        return reduced;
     }
 
     @Override
     public int[] toArray() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        int[] array = new int[this.stream.size()];
+        for (int i = 0; i < this.stream.size(); i++) {
+            array[i] = this.stream.get(i);
+        }
+        return array;
     }
-
 }
